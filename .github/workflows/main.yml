@@ -2,34 +2,36 @@ name: Atualizar EPG
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # de 6 em 6 horas
-  workflow_dispatch:       # podes correr manualmente
+    - cron: '0 */6 * * *' # Corre de 6 em 6 horas
+  workflow_dispatch:       # Para poderes correr manualmente
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    
+
     steps:
-     - name: Checkout repo
-       uses: actions/checkout@v3
-       with:
-         persist-credentials: true
-         ref: main  # ou gh-pages, se estiveres a usar essa branch para GitHub Pages
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: true
+        ref: gh-pages   # ATENÇÃO! Usa a mesma branch que configuraste no GitHub Pages
 
+    - name: Configurar Git
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
 
-      - name: Instalar gunzip
-        run: sudo apt-get update && sudo apt-get install -y gzip
+    - name: Instalar gunzip
+      run: sudo apt-get update && sudo apt-get install -y gzip
 
-      - name: Fazer download do EPG .gz
-        run: curl -L -o epg.xml.gz https://epgshare01.online/epgshare01/epg_ripper_PT1.xml.gz
+    - name: Download EPG .gz
+      run: curl -L -o epg.xml.gz https://epgshare01.online/epgshare01/epg_ripper_PT1.xml.gz
 
-      - name: Descomprimir para epg.xml
-        run: gunzip -f epg.xml.gz
+    - name: Descomprimir EPG
+      run: gunzip -f epg.xml.gz
 
-      - name: Commit e Push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add epg.xml
-          git commit -m "Atualizar EPG automático" || echo "Nada a commitar"
-          git push
+    - name: Commit e Push
+      run: |
+        git add epg.xml
+        git commit -m "EPG atualizado automaticamente" || echo "Nada para commitar"
+        git push origin gh-pages
