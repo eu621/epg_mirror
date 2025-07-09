@@ -9,8 +9,12 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+     - name: Checkout repo
+       uses: actions/checkout@v3
+       with:
+         persist-credentials: true
+         ref: main  # ou gh-pages, se estiveres a usar essa branch para GitHub Pages
+
 
       - name: Instalar gunzip
         run: sudo apt-get update && sudo apt-get install -y gzip
