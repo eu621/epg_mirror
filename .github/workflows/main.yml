@@ -2,8 +2,8 @@ name: Atualizar EPG
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Corre de 6 em 6 horas
-  workflow_dispatch:       # Para poderes correr manualmente
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   update:
@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         persist-credentials: true
-        ref: gh-pages   # ATENÇÃO! Usa a mesma branch que configuraste no GitHub Pages
+        ref: gh-pages  # OU a branch certa!
 
     - name: Configurar Git
       run: |
@@ -24,14 +24,14 @@ jobs:
     - name: Instalar gunzip
       run: sudo apt-get update && sudo apt-get install -y gzip
 
-    - name: Download EPG .gz
+    - name: Fazer download do EPG .gz
       run: curl -L -o epg.xml.gz https://epgshare01.online/epgshare01/epg_ripper_PT1.xml.gz
 
-    - name: Descomprimir EPG
+    - name: Descomprimir
       run: gunzip -f epg.xml.gz
 
-    - name: Commit e Push
+    - name: Commit & Push
       run: |
         git add epg.xml
-        git commit -m "EPG atualizado automaticamente" || echo "Nada para commitar"
+        git commit -m "EPG atualizado" || echo "Nada para commitar"
         git push origin gh-pages
