@@ -3,18 +3,18 @@ name: Atualizar EPG
 on:
   schedule:
     - cron: '0 */6 * * *'   # Corre de 6 em 6 horas
-  workflow_dispatch:         # Para poderes correr à mão se quiseres
+  workflow_dispatch:         # Para correres manualmente
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repo na gh-pages
         uses: actions/checkout@v3
         with:
-          persist-credentials: true   # Mantém o token para push
-          ref: gh-pages               # ⚡️ Branch onde o Pages vai buscar
+          persist-credentials: true
+          ref: gh-pages  # ⚡️ Branch onde o Pages vai buscar
 
       - name: Configurar Git
         run: |
@@ -30,8 +30,19 @@ jobs:
       - name: Descomprimir EPG
         run: gunzip -f epg.xml.gz
 
-      - name: Commit & Push para gh-pages
+      - name: Commit & Push para gh-pages com GITHUB_TOKEN
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add epg.xml
-          git commit -m "EPG atualizado automaticamente" || echo "Nada para commitar"
+          git commit -m "Atualizar EPG automaticamente" || echo "Nada para commitar"
+
+          echo "⚡ Branch atual:"
+          git branch
+          echo "⚡ Remotes configurados:"
+          git remote -v
+
+          # Força o remote a usar o token
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
+
           git push origin gh-pages
